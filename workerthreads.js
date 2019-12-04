@@ -6,11 +6,14 @@ if (isMainThread) {
     // This re-loads the current file inside a Worker instance.
     const worker = new Worker(__filename);
     const subChannel = new MessageChannel();
-    worker.postMessage({ hereIsYourPort: subChannel.port1 }, [subChannel.port1]);
+
+    worker.postMessage({ myPort: subChannel.port1 }, [subChannel.port1]);
     console.log("Lets start making some work on a different thread!");
+
     subChannel.port2.on('message', (value) => {
         console.log('received:', value);
     });
+
     console.log("executing something else in the meantime... main thread is not blocked");
     setInterval(() => console.log('hey!'), 1000);
 } else {
@@ -22,10 +25,10 @@ if (isMainThread) {
             return fibo(n - 2) + fibo(n - 1);
     }
     const result = fibo(myNumber);
-    parentPort.once('message', (value) => {
-        assert(value.hereIsYourPort instanceof MessagePort);
-        value.hereIsYourPort.postMessage({ number: result, status: 'Done' });
-        value.hereIsYourPort.close();
+    parentPort.once('message', (listener) => {
+        assert(listener.myPort instanceof MessagePort);
+        listener.myPort.postMessage({ number: result, status: 'Done' });
+        listener.myPort.close();
     });
 
 }
