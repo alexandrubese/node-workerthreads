@@ -25,10 +25,10 @@ if (isMainThread) {
             return fibo(n - 2) + fibo(n - 1);
     }
     const result = fibo(myNumber);
-    parentPort.once('message', (listener) => {
-        assert(listener.myPort instanceof MessagePort);
-        listener.myPort.postMessage({ number: result, status: 'Done' });
-        listener.myPort.close();
+    parentPort.once('message', (message) => {
+        assert(message.myPort instanceof MessagePort);
+        message.myPort.postMessage({ number: result, status: 'Done' });
+        message.myPort.close();
     });
 
 }
